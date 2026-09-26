@@ -119,6 +119,21 @@ function renderGuide(id) {
     : "";
   const prose = (section) => (section.paragraphs || [])
     .map((paragraph) => `<p>${paragraph}</p>`).join("");
+  const articles = guide.sections.map((section) => `
+    <article>
+      <h3>${section.heading}</h3>
+      ${prose(section)}
+      ${steps(section)}
+    </article>`);
+  const midpoint = Math.ceil(articles.length / 2);
+  const photos = `
+    <div class="guide-photos">
+      ${guide.photos.map((photo) => `
+        <figure>
+          <img src="${photo.src}" alt="${photo.alt}" />
+          <figcaption>${photo.caption}</figcaption>
+        </figure>`).join("")}
+    </div>`;
   return `
     <section class="guide" aria-labelledby="guide-title">
       <figure class="hero-photo">
@@ -128,20 +143,10 @@ function renderGuide(id) {
         <p class="eyebrow">How this loan works</p>
         <h2 id="guide-title">A plain-language guide</h2>
         <p class="lede">${guide.lead}</p>
-        ${guide.sections.map((section) => `
-          <article>
-            <h3>${section.heading}</h3>
-            ${prose(section)}
-            ${steps(section)}
-          </article>`).join("")}
+        ${articles.slice(0, midpoint).join("")}
+        ${photos}
+        ${articles.slice(midpoint).join("")}
         <p class="guide-aside">${guide.aside}</p>
-      </div>
-      <div class="guide-photos">
-        ${guide.photos.map((photo) => `
-          <figure>
-            <img src="${photo.src}" alt="${photo.alt}" />
-            <figcaption>${photo.caption}</figcaption>
-          </figure>`).join("")}
       </div>
     </section>`;
 }

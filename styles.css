@@ -28,7 +28,6 @@
     linear-gradient(180deg, var(--page-base) 0%, var(--paper) 100%);
 }
 
-body[data-theme="day"] .stat.featured { background: var(--pine); color: white; }
 
 :root[data-theme="night"],
 body[data-theme="night"] {
@@ -258,12 +257,11 @@ body[data-theme="day"] .theme-icon-sun { display: grid; }
 
 .guide {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-.hero-photo { margin: 0; grid-column: 1 / -1; }
+.hero-photo { margin: 0; }
 .hero-photo img {
   height: min(420px, 52vw);
   border-radius: 1.4rem;
@@ -295,9 +293,13 @@ body[data-theme="day"] .theme-icon-sun { display: grid; }
   font-size: 0.88rem;
 }
 
-.guide-photos { display: grid; gap: 0.8rem; align-content: start; }
+.guide-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
 .guide-photos figure { margin: 0; overflow: hidden; }
-.guide-photos img { height: 230px; }
+.guide-photos img { height: min(320px, 42vw); }
 .guide-photos figcaption {
   padding: 0.75rem 0.9rem 0.9rem;
   color: var(--muted);
@@ -384,9 +386,10 @@ h2 { margin: 0; font-size: 1.45rem; }
 
 .stat { padding: 1rem 1.1rem 0.95rem; }
 
-.stat.featured { background: var(--pine-deep); color: #f6f1e8; }
-.stat.featured .stat-note, .stat.accent .stat-note { color: inherit; opacity: 0.78; }
-.stat.accent { background: var(--accent-card); color: var(--ink); }
+.stat.featured { background: var(--card); color: var(--ink); }
+.stat.featured .stat-label { color: var(--pine); }
+.stat.featured .stat-note, .stat.accent .stat-note { color: var(--muted); opacity: 1; }
+.stat.accent { background: var(--card); color: var(--ink); }
 
 .stat-label {
   margin: 0;
@@ -594,7 +597,7 @@ footer { margin-top: 1.2rem; font-size: 0.85rem; }
   .app-shell.nav-open .nav-note { display: grid; }
   .brand strong { font-size: 1.2rem; }
   .main { padding: 1rem 0.7rem 2rem; }
-  .module-cards, .guide, .landing-strip { grid-template-columns: 1fr; }
+  .module-cards, .landing-strip, .guide-photos { grid-template-columns: 1fr; }
   .landing-strip img { height: 160px; }
 }
 
