@@ -378,6 +378,7 @@ function renderModule(id) {
         <p class="lede">${item.summary}</p>
       </div>
     </header>
+    ${renderGuide(id)}
     <div id="module-summary"></div>
     <div class="workspace">
       <form id="module-form" class="panel" novalidate>
@@ -398,15 +399,19 @@ function renderModule(id) {
         </div>
       </section>
     </div>
-    ${renderGuide(id)}
     <section class="panel schedule-panel">
       <div class="schedule-head">
-        <div>
-          <h2>Amortization schedule</h2>
-          <p id="module-count">Every payment until the balance is zero, or until a commercial term ends.</p>
-        </div>
+        <button id="module-schedule-toggle" class="schedule-toggle" type="button" aria-expanded="false" aria-controls="module-schedule">
+          <span class="plus" aria-hidden="true">+</span>
+          <span>
+            <h2>Amortization schedule</h2>
+            <p id="module-count">Every payment until the balance is zero, or until a commercial term ends.</p>
+          </span>
+        </button>
       </div>
-      <div id="module-table"></div>
+      <div id="module-schedule" class="schedule-body" hidden>
+        <div id="module-table"></div>
+      </div>
     </section>`;
 
   const form = view.querySelector("#module-form");
@@ -434,6 +439,7 @@ function renderModule(id) {
     window.clearTimeout(debounceId);
     debounceId = window.setTimeout(run, 160);
   });
+  mountScheduleToggles();
   run();
   if (id === "purchase") document.dispatchEvent(new CustomEvent("buydown-show"));
 }
@@ -449,8 +455,8 @@ function drawChart(rows) {
     datasets: [{
       label: "Balance",
       data: sampled.map((row) => row.ending),
-      borderColor: "#1f6f5b",
-      backgroundColor: "rgba(31, 111, 91, 0.12)",
+      borderColor: "#7dcebb",
+      backgroundColor: "rgba(125, 206, 187, 0.16)",
       fill: true,
       tension: 0.18,
       pointRadius: 0,
@@ -472,8 +478,11 @@ function drawChart(rows) {
         tooltip: { callbacks: { label: (item) => money.format(item.parsed.y) } },
       },
       scales: {
-        y: { ticks: { callback: (value) => money.format(value) }, grid: { color: "rgba(28, 36, 48, 0.06)" } },
-        x: { ticks: { maxTicksLimit: 6 }, grid: { display: false } },
+        y: {
+          ticks: { color: "#c9d4cc", callback: (value) => money.format(value) },
+          grid: { color: "rgba(246, 241, 232, 0.08)" },
+        },
+        x: { ticks: { color: "#c9d4cc", maxTicksLimit: 6 }, grid: { display: false } },
       },
     },
   });
@@ -490,7 +499,45 @@ function selectModule(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function mountTheme() {
+  const toggle = document.querySelector("#theme-toggle");
+  const saved = window.localStorage.getItem("loan-desk-theme");
+  const theme = saved === "day" || saved === "night" ? saved : "night";
+  applyTheme(theme);
+  toggle.addEventListener("click", () => {
+    const next = document.body.dataset.theme === "night" ? "day" : "night";
+    applyTheme(next);
+    window.localStorage.setItem("loan-desk-theme", next);
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  document.body.dataset.theme = theme;
+  const night = theme === "night";
+  const toggle = document.querySelector("#theme-toggle");
+  toggle.textContent = night ? "Day mode" : "Night mode";
+  toggle.setAttribute("aria-pressed", night ? "true" : "false");
+  document.dispatchEvent(new CustomEvent("theme-change"));
+}
+
+function mountScheduleToggles() {
+  document.querySelectorAll(".schedule-toggle").forEach((button) => {
+    if (button.dataset.bound) return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      const panel = document.getElementById(button.getAttribute("aria-controls"));
+      const open = button.getAttribute("aria-expanded") !== "true";
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+      if (panel) panel.hidden = !open;
+      button.querySelector(".plus").textContent = open ? "–" : "+";
+    });
+  });
+}
+
 export function mountShell() {
+  mountTheme();
+  mountScheduleToggles();
   nav.innerHTML = `
     <button type="button" data-module="home" aria-current="page">
       <strong>Home</strong>

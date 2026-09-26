@@ -205,8 +205,8 @@ function renderChart(rows, baselineRows) {
       {
         label: "This plan",
         data: sampled.map((row) => actualMap.get(row.month) ?? null),
-        borderColor: "#1f6f5b",
-        backgroundColor: "rgba(31, 111, 91, 0.12)",
+        borderColor: "#7dcebb",
+        backgroundColor: "rgba(125, 206, 187, 0.16)",
         fill: true,
         tension: 0.15,
         pointRadius: 0,
@@ -238,7 +238,7 @@ function renderChart(rows, baselineRows) {
       maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
       plugins: {
-        legend: { labels: { usePointStyle: true, boxWidth: 8 } },
+        legend: { labels: { color: "#f3eee6", usePointStyle: true, boxWidth: 8 } },
         tooltip: {
           callbacks: {
             label: (item) => `${item.dataset.label}: ${money.format(item.parsed.y)}`,
@@ -247,10 +247,10 @@ function renderChart(rows, baselineRows) {
       },
       scales: {
         y: {
-          ticks: { callback: (value) => money.format(value) },
-          grid: { color: "rgba(28, 36, 48, 0.06)" },
+          ticks: { color: "#c9d4cc", callback: (value) => money.format(value) },
+          grid: { color: "rgba(246, 241, 232, 0.08)" },
         },
-        x: { ticks: { maxTicksLimit: 8 }, grid: { display: false } },
+        x: { ticks: { color: "#c9d4cc", maxTicksLimit: 8 }, grid: { display: false } },
       },
     },
   });

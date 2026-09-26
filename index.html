@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,13 +16,14 @@
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
     <script type="module" src="app.js"></script>
   </head>
-  <body>
+  <body data-theme="night">
     <div class="app-shell">
       <aside class="sidenav">
         <div class="brand">
           <p class="eyebrow">Loan desk</p>
           <strong>Monthly payment &amp; amortization</strong>
         </div>
+        <button id="theme-toggle" class="ghost theme-toggle" type="button" aria-pressed="true">Day mode</button>
         <button id="menu-toggle" class="ghost menu-toggle" type="button" aria-controls="module-nav" aria-expanded="false">Menu</button>
         <nav id="module-nav" aria-label="Mortgage types"></nav>
         <p class="nav-note">Estimates only. Nothing you type leaves this page.</p>
@@ -179,12 +180,16 @@
 
       <section class="panel schedule-panel">
         <div class="schedule-head">
-          <div>
-            <h2>Amortization schedule</h2>
-            <p id="schedule-count">Every payment until the balance is zero.</p>
-          </div>
+          <button class="schedule-toggle" type="button" aria-expanded="false" aria-controls="buydown-schedule">
+            <span class="plus" aria-hidden="true">+</span>
+            <span>
+              <h2>Amortization schedule</h2>
+              <p id="schedule-count">Every payment until the balance is zero.</p>
+            </span>
+          </button>
           <button id="export-sheet" class="ghost" type="button">Export to Sheet</button>
         </div>
+        <div id="buydown-schedule" class="schedule-body" hidden>
         <div class="legend">
           <span><i class="swatch buydown"></i> Buydown</span>
           <span><i class="swatch recast"></i> Recast month</span>
@@ -207,6 +212,7 @@
             </thead>
             <tbody id="schedule-body"></tbody>
           </table>
+        </div>
         </div>
       </section>
 
