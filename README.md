@@ -25,3 +25,5 @@ node test-amortization.mjs
 ## Deploy
 
 Upload this folder to any static host (GitHub Pages, Netlify, Azure Static Web Apps, or an S3/Blob static website). There is no server and no monthly app cost beyond the host’s free tier.
+
+# Post deploy
