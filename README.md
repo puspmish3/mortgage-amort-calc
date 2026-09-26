@@ -1,6 +1,8 @@
-# Buydown Amortization
+# Mortgage payment calculators
 
-A single-page calculator for a mortgage that is already in progress and still has a 1-year (or shorter) buydown. It runs entirely in the browser. Nothing you type is sent anywhere.
+A static page with four loan modules — Purchase, Refinance, Commercial, and Community lending. Each one has a short guide and a monthly-payment calculator with an amortization schedule. The original buydown schedule lives inside Purchase, because a temporary rate buydown is a purchase-loan feature.
+
+Everything runs in the browser. Nothing you type is sent anywhere.
 
 ## Run locally
 
@@ -20,6 +22,7 @@ On the Schedule sheet, a one-time extra over $1,000 is marked in coral with the 
 
 ```powershell
 node test-amortization.mjs
+node test-products.mjs
 ```
 
 ## Deploy

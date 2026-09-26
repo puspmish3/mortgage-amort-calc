@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Buydown Amortization</title>
+    <title>Mortgage payment calculators</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,14 +17,29 @@
     <script type="module" src="app.js"></script>
   </head>
   <body>
-    <div class="page">
+    <div class="app-shell">
+      <aside class="sidenav">
+        <div class="brand">
+          <p class="eyebrow">Loan desk</p>
+          <strong>Monthly payment &amp; amortization</strong>
+        </div>
+        <button id="menu-toggle" class="ghost menu-toggle" type="button" aria-controls="module-nav" aria-expanded="false">Menu</button>
+        <nav id="module-nav" aria-label="Mortgage types"></nav>
+        <p class="nav-note">Estimates only. Nothing you type leaves this page.</p>
+      </aside>
+      <main class="main">
+        <div id="landing"></div>
+        <div id="module-view" hidden></div>
+        <div id="buydown-module" hidden>
+    <div class="page buydown-page">
       <header class="masthead">
         <div>
-          <p class="eyebrow">In-progress loan · client-side only</p>
-          <h1>Buydown amortization</h1>
+          <p class="eyebrow">Purchase · temporary rate buydown</p>
+          <h2 class="buydown-title">Buydown schedule</h2>
           <p class="lede">
-            See the payment now, the payment after the buydown, and how extra
-            principal or a recast changes the rest of the loan.
+            For a purchase loan that already has a 1-year or 2-year buydown.
+            See the payment now, the payment after the discount ends, and how
+            extra principal or a recast changes the rest of the loan.
           </p>
         </div>
         <button id="recalculate" class="recalc" type="button">Recalculate</button>
@@ -196,8 +211,11 @@
       </section>
 
       <footer>
-        <p>Nothing you enter leaves this page. Refreshing clears the form.</p>
+        <p>The buydown schedule stays in this browser. Refreshing clears the form.</p>
       </footer>
+    </div>
+        </div>
+      </main>
     </div>
   </body>
 </html>

@@ -6,6 +6,7 @@ import {
   toMonthValue,
 } from "./amortization.js";
 import { exportFileName, workbookBlob } from "./excel-export.js";
+import { mountShell } from "./shell.js";
 
 const form = document.querySelector("#loan-form");
 const extraList = document.querySelector("#extra-list");
@@ -363,3 +364,4 @@ document.querySelector("#export-sheet").addEventListener("click", async (event) 
 fillDefaults();
 renderExtras();
 calculateNow();
+mountShell();
