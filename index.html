@@ -17,13 +17,20 @@
     <script type="module" src="app.js"></script>
   </head>
   <body data-theme="night">
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="true" aria-label="Switch to day mode" title="Switch to day mode">
+      <span class="theme-icon theme-icon-moon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M15.5 2.5a8.8 8.8 0 1 0 6 14.2A9 9 0 1 1 15.5 2.5z"/></svg>
+      </span>
+      <span class="theme-icon theme-icon-sun" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6"/></svg>
+      </span>
+    </button>
     <div class="app-shell">
       <aside class="sidenav">
         <div class="brand">
           <p class="eyebrow">Loan desk</p>
           <strong>Monthly payment &amp; amortization</strong>
         </div>
-        <button id="theme-toggle" class="ghost theme-toggle" type="button" aria-pressed="true">Day mode</button>
         <button id="menu-toggle" class="ghost menu-toggle" type="button" aria-controls="module-nav" aria-expanded="false">Menu</button>
         <nav id="module-nav" aria-label="Mortgage types"></nav>
         <p class="nav-note">Estimates only. Nothing you type leaves this page.</p>

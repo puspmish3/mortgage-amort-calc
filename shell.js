@@ -516,7 +516,9 @@ function applyTheme(theme) {
   document.body.dataset.theme = theme;
   const night = theme === "night";
   const toggle = document.querySelector("#theme-toggle");
-  toggle.textContent = night ? "Day mode" : "Night mode";
+  const label = night ? "Switch to day mode" : "Switch to night mode";
+  toggle.setAttribute("aria-label", label);
+  toggle.title = label;
   toggle.setAttribute("aria-pressed", night ? "true" : "false");
   document.dispatchEvent(new CustomEvent("theme-change"));
 }

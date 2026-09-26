@@ -133,9 +133,30 @@ button, input { font: inherit; }
   font-size: 0.78rem;
 }
 
-.menu-toggle, .theme-toggle { justify-self: start; }
-.menu-toggle { display: none; }
-.theme-toggle { background: transparent; color: #f6f1e8; border-color: rgba(246, 241, 232, 0.24); }
+.menu-toggle { display: none; justify-self: start; }
+
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 3.1rem;
+  height: 3.1rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--gold);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.theme-toggle svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.theme-icon { display: none; }
+body[data-theme="night"] .theme-icon-moon,
+body[data-theme="day"] .theme-icon-sun { display: grid; }
+.theme-toggle:hover { transform: translateY(-1px); }
 
 .main {
   min-width: 0;
