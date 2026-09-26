@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buydown Amortization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@380;460;560;650&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <div class="page">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">In-progress loan · client-side only</p>
+          <h1>Buydown amortization</h1>
+          <p class="lede">
+            See the payment now, the payment after the buydown, and how extra
+            principal or a recast changes the rest of the loan.
+          </p>
+        </div>
+        <button id="recalculate" class="recalc" type="button">Recalculate</button>
+      </header>
+
+      <section class="summary" aria-live="polite" aria-label="Key figures">
+        <article class="stat featured">
+          <p class="stat-label">Payment · Year 1</p>
+          <p class="stat-value" id="year-one-payment">—</p>
+          <p class="stat-note" id="year-one-note">Buydown rate</p>
+        </article>
+        <article class="stat">
+          <p class="stat-label">Payment · After buydown</p>
+          <p class="stat-value" id="after-payment">—</p>
+          <p class="stat-note" id="after-note">Note rate</p>
+        </article>
+        <article class="stat">
+          <p class="stat-label">Payoff in</p>
+          <p class="stat-value" id="payoff">—</p>
+          <p class="stat-note" id="payoff-note">Compared with no extras</p>
+        </article>
+        <article class="stat">
+          <p class="stat-label">Total interest</p>
+          <p class="stat-value" id="interest">—</p>
+          <p class="stat-note" id="interest-note">Baseline</p>
+        </article>
+        <article class="stat accent">
+          <p class="stat-label">Interest saved</p>
+          <p class="stat-value" id="saved">—</p>
+          <p class="stat-note" id="saved-note">Versus the no-extras baseline</p>
+        </article>
+        <article class="stat">
+          <p class="stat-label">Extra principal paid</p>
+          <p class="stat-value" id="extra-paid">—</p>
+          <p class="stat-note">Rules plus payment overage</p>
+        </article>
+      </section>
+
+      <div class="workspace">
+        <form id="loan-form" class="panel" novalidate>
+          <div class="panel-head">
+            <h2>Loan today</h2>
+            <p>Start from the balance you owe now, not the original amount.</p>
+          </div>
+
+          <div id="form-errors" class="errors" hidden></div>
+
+          <div class="grid">
+            <label>
+              Current outstanding principal
+              <span class="affix">$</span>
+              <input id="principal" name="principal" type="number" inputmode="decimal" min="0" step="0.01" required />
+            </label>
+            <label>
+              Note interest rate
+              <span class="suffix">% / year</span>
+              <input id="noteRate" name="noteRate" type="number" inputmode="decimal" min="0" max="30" step="0.001" required />
+            </label>
+            <label>
+              Buydown reduction
+              <span class="suffix">%</span>
+              <input id="buydownReduction" name="buydownReduction" type="number" inputmode="decimal" min="0" step="0.001" required />
+              <small>A 1-0 buydown is 1%.</small>
+            </label>
+            <label>
+              Buydown months left
+              <input id="buydownMonths" name="buydownMonths" type="number" inputmode="numeric" min="0" max="24" step="1" required />
+              <small>0–24. Use 12 for a full year still ahead.</small>
+            </label>
+            <fieldset class="term">
+              <legend>Remaining term</legend>
+              <label>
+                Years
+                <input id="termYears" name="termYears" type="number" inputmode="numeric" min="0" max="50" step="1" required />
+              </label>
+              <label>
+                Months
+                <input id="termMonths" name="termMonths" type="number" inputmode="numeric" min="0" max="11" step="1" required />
+              </label>
+            </fieldset>
+            <label>
+              First payment month
+              <input id="firstPayment" name="firstPayment" type="month" required />
+            </label>
+            <label class="wide">
+              Current monthly payment
+              <span class="affix">$</span>
+              <input id="currentPayment" name="currentPayment" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Blank uses the scheduled payment" />
+              <small>Anything above the scheduled payment goes to principal. A lower amount is ignored.</small>
+            </label>
+          </div>
+
+          <fieldset class="mode">
+            <legend>What should extra principal do?</legend>
+            <label class="choice">
+              <input type="radio" name="mode" value="keep" checked />
+              <span>
+                <strong>Keep payment, pay off early</strong>
+                <small>The contractual payment stays put. Extras shorten the loan.</small>
+              </span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="mode" value="recast" />
+              <span>
+                <strong>Recast — lower payment</strong>
+                <small>Re-amortize once on the date below. The term stays the same.</small>
+              </span>
+            </label>
+            <label id="recast-field">
+              Recast starting month
+              <input id="recastMonth" name="recastMonth" type="month" />
+              <small id="recast-hint">Defaults to the month after the buydown ends.</small>
+            </label>
+          </fieldset>
+
+          <section class="extras" aria-labelledby="extras-title">
+            <div class="panel-head">
+              <h2 id="extras-title">Extra payments</h2>
+              <p>Add one-time or repeating principal payments. They stack.</p>
+            </div>
+            <div id="extra-list" class="extra-list"></div>
+            <p id="extra-empty" class="empty">No extra rules yet. The schedule uses only the contractual payment and any overage.</p>
+            <button id="add-extra" class="ghost" type="button">Add extra payment</button>
+          </section>
+        </form>
+
+        <section class="panel chart-panel">
+          <div class="panel-head">
+            <h2>Balance over time</h2>
+            <p>Solid line is this plan. Dashed line is the same loan with no extras and no recast.</p>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="balance-chart" aria-label="Balance over time chart" role="img"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel schedule-panel">
+        <div class="schedule-head">
+          <div>
+            <h2>Amortization schedule</h2>
+            <p id="schedule-count">Every payment until the balance is zero.</p>
+          </div>
+          <button id="export-sheet" class="ghost" type="button">Export to Sheet</button>
+        </div>
+        <div class="legend">
+          <span><i class="swatch buydown"></i> Buydown</span>
+          <span><i class="swatch recast"></i> Recast month</span>
+          <span><i class="swatch extra"></i> Extra principal</span>
+          <span><i class="swatch final"></i> Payoff</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Month</th>
+                <th>Rate</th>
+                <th>Payment</th>
+                <th>Interest</th>
+                <th>Principal</th>
+                <th>Extra</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        <p>Nothing you enter leaves this page. Refreshing clears the form.</p>
+      </footer>
+    </div>
+  </body>
+</html>
