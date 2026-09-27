@@ -1,4 +1,5 @@
 import { guides, modules } from "./guides.js";
+import { productExportFileName, productWorkbookBlob } from "./product-export.js";
 import {
   calculateCommercial,
   calculateCommunity,
@@ -416,6 +417,7 @@ function renderModule(id) {
             <p id="module-count">Every payment until the balance is zero, or until a commercial term ends.</p>
           </span>
         </button>
+        <button id="module-export" class="ghost" type="button">Export to Sheet</button>
       </div>
       <div id="module-schedule" class="schedule-body" hidden>
         <div id="module-table"></div>
@@ -423,6 +425,7 @@ function renderModule(id) {
     </section>`;
 
   const form = view.querySelector("#module-form");
+  let lastResult = null;
   const run = () => {
     const raw = {};
     [...form.elements].forEach((control) => {
@@ -437,6 +440,7 @@ function renderModule(id) {
       return;
     }
     showErrors(errors, []);
+    lastResult = result;
     view.querySelector("#module-summary").innerHTML = calc.render(result);
     view.querySelector("#module-table").innerHTML = renderScheduleTable(result.rows);
     view.querySelector("#module-count").textContent =
@@ -446,6 +450,14 @@ function renderModule(id) {
   form.addEventListener("input", () => {
     window.clearTimeout(debounceId);
     debounceId = window.setTimeout(run, 160);
+  });
+  view.querySelector("#module-export").addEventListener("click", (event) => {
+    downloadProductSheet(event.currentTarget, {
+      id,
+      title: item.title,
+      rows: lastResult?.rows || [],
+      summary: lastResult?.summary || {},
+    });
   });
   mountScheduleToggles();
   run();
@@ -529,6 +541,36 @@ function applyTheme(theme) {
   toggle.title = label;
   toggle.setAttribute("aria-pressed", night ? "true" : "false");
   document.dispatchEvent(new CustomEvent("theme-change"));
+}
+
+async function downloadProductSheet(button, spec) {
+  if (!spec.rows.length) return;
+  const original = button.textContent;
+  button.disabled = true;
+  button.textContent = "Preparing sheet…";
+  try {
+    const preparedOn = new Date().toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    const blob = await productWorkbookBlob(spec, preparedOn);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = productExportFileName(spec);
+    link.click();
+    URL.revokeObjectURL(url);
+    button.textContent = original;
+  } catch (error) {
+    button.textContent = "Sheet unavailable";
+    window.setTimeout(() => {
+      button.textContent = original;
+    }, 1800);
+    console.error(error);
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function mountScheduleToggles() {
