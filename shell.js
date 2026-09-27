@@ -393,6 +393,9 @@ function renderModule(id) {
         </div>
         <div id="module-errors" class="errors" hidden></div>
         ${forms[id](defaults)}
+        <div class="form-actions">
+          <button class="recalc" type="button">Recalculate</button>
+        </div>
       </form>
       <section class="panel chart-panel">
         <div class="panel-head">
